@@ -5,4 +5,5 @@ token.json
 attachments_temp/
 phone_numbers.csv
 called_numbers.csv
+call_summaries.csv
 .env
