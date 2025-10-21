@@ -59,10 +59,10 @@ def create_call(number):
             phone_number_id=PHONE_ID,
             customer={"number": number}
         )
-        print(f"📞 Appel lancé vers {number} (ID: {call.id})")
+        print(f"==> [INFO] [*] Appel lancé vers {number} (ID: {call.id})")
         return call.id
     except Exception as e:
-        print(f"❌ Erreur lors de l'appel à {number}: {e}")
+        print(f"==> [ERROR] [!] Erreur lors de l'appel à {number}: {e}")
         return None
 
 def wait_for_in_progress(call_id, max_wait=30):
@@ -70,7 +70,7 @@ def wait_for_in_progress(call_id, max_wait=30):
     for _ in range(max_wait):
         call = client.calls.get(call_id)
         status = call.status
-        print(f"⏳ Statut: {status}")
+        print(f"- Statut: {status}")
         if status == "in-progress":
             return True
         elif status in ("failed", "no-answer", "ended", "completed"):
@@ -89,79 +89,80 @@ def wait_for_completion(call_id):
     return None
 
 def save_summary(call_obj, number):
-    """Sauvegarde le résumé Vapi (analysis.summary)"""
+    """Sauvegarde le résumé (summary) et les données structurées (structuredData)"""
     summary = None
+    structured_data = None
 
-    # ✅ Corrigé : accès direct à l'attribut .summary
     if hasattr(call_obj, "analysis") and call_obj.analysis:
-        try:
-            summary = call_obj.analysis.summary
-        except AttributeError:
-            summary = None
+        # 🔹 Récupère le résumé textuel
+        summary = getattr(call_obj.analysis, "summary", None)
 
-    if not summary:
-        print(f"⚠️ Aucun résumé disponible pour {number}")
+        # 🔹 Récupère les données structurées si disponibles
+        structured_data = getattr(call_obj.analysis, "structured_data", None) or \
+                        getattr(call_obj.analysis, "structuredData", None)
+
+    if not summary and not structured_data:
+        print(f"==> [WARNING] [!] Aucun résumé ni donnée structurée pour {number}")
         return
 
     entry = {
         "number": number,
         "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        "summary": summary
+        "summary": summary or "",
+        "structured_data": structured_data or {}
     }
 
-    # Écriture dans le fichier JSON
+    # Crée le fichier s’il n’existe pas encore
     if not os.path.exists(SUMMARY_FILE):
         with open(SUMMARY_FILE, "w") as f:
             json.dump([entry], f, indent=2)
     else:
-        with open(SUMMARY_FILE, "r+") as f:
+        with open(SUMMARY_FILE, "r+", encoding="utf-8") as f:
             try:
                 data = json.load(f)
             except json.JSONDecodeError:
                 data = []
             data.append(entry)
             f.seek(0)
-            json.dump(data, f, indent=2)
+            json.dump(data, f, indent=2, ensure_ascii=False)
 
-    print(f"✅ Résumé sauvegardé pour {number}")
-
+    print(f"==> [INFO] [*] Données sauvegardées pour {number} → résumé + structuredData")
 
 # ---------------------------
 # MAIN LOOP
 # ---------------------------
 if __name__ == "__main__":
     numbers = get_numbers_to_call()
-    print(f"📋 {len(numbers)} numéros à appeler")
+    print(f"==> [INFO] [*] {len(numbers)} numéros à appeler")
 
     for num in numbers:
-        print(f"\n🚀 Appel de {num} ...")
+        print(f"\n==> [INFO] [*] Appel de {num} ...")
         call_id = create_call(num)
         if not call_id:
             continue
 
         # Attente de l'état "in-progress"
-        print("🕓 En attente de passage à 'in-progress'...")
+        print("==> [INFO] [*] En attente de passage à 'in-progress'...")
         started = wait_for_in_progress(call_id)
         if started:
-            print(f"✅ L'appel vers {num} est maintenant 'in-progress'")
+            print(f"==> [INFO] [*] L'appel vers {num} est maintenant 'in-progress'")
             log_call(num, "in-progress")
         else:
-            print(f"⚠️ L'appel vers {num} n’a jamais atteint 'in-progress'")
+            print(f"==> [WARNING] [!] L'appel vers {num} n’a jamais atteint 'in-progress'")
             continue
 
         # Attente de la fin de l'appel
         call_obj = wait_for_completion(call_id)
         if not call_obj:
-            print(f"⚠️ Pas de réponse finale pour {num}")
+            print(f"==> [WARNING] [!] Pas de réponse finale pour {num}")
             continue
 
-        print(f"📞 Appel terminé ({num}) → {call_obj.status}")
+        print(f"==> [INFO] [*] Appel terminé ({num}) → {call_obj.status}")
         log_call(num, call_obj.status)
 
         # Récupération du résumé
         save_summary(call_obj, num)
-
+        
         # Pause entre les appels
         time.sleep(10)
-
-    print("\n🎉 Campagne terminée.")
+    print("\n==> [SUCCESS] [+] Campagne terminée.")
