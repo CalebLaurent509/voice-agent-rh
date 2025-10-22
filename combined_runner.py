@@ -2,6 +2,7 @@ import subprocess
 import time
 import datetime
 from get_applicants_number import main
+import logging
 
 def is_within_hours():
     """Renvoie True si on est entre 7h00 et 4h00 (du lendemain)."""
@@ -14,13 +15,13 @@ def is_within_hours():
 
 def start_server():
     """Démarre le serveur FastAPI dans un sous-processus"""
-    print("🚀 [INFO] Lancement du serveur FastAPI...")
+    logging.info("[INFO] Lancement du serveur FastAPI...")
     return subprocess.Popen(
         ["uvicorn", "get_calendly_data:app", "--host", "0.0.0.0", "--port", "10000"]
     )
 
 if __name__ == "__main__":
-    print("📬 [Render] Gmail watcher + Server started")
+    logging.info("[INFO] Lancement du serveur et du Gmail watcher...")
 
     # Lancer le serveur
     server_process = start_server()
@@ -28,16 +29,16 @@ if __name__ == "__main__":
     try:
         while True:
             if is_within_hours():
-                print("🕓 [INFO] Dans la plage horaire (7h → 4h) : scan Gmail...")
+                logging.info("[INFO] Dans la plage horaire (7h → 4h) : scan Gmail...")
                 try:
                     main()
-                    print("✅ [INFO] Scan terminé. Attente 10 min...")
+                    logging.info("[INFO] Scan Gmail terminé. En attente avant le prochain scan...")
                 except Exception as e:
-                    print(f"❌ [ERROR] Gmail watcher: {e}")
-                time.sleep(600)  # 10 minutes
+                    logging.error(f"[ERROR] Gmail watcher: {e}")
+                time.sleep(30)  # 10 minutes
             else:
-                print("🌙 [INFO] En dehors des heures d’appel. Attente 30 min...")
+                logging.info("[INFO] En dehors des heures d’appel. Attente 30 min...")
                 time.sleep(1800)
     except KeyboardInterrupt:
-        print("🛑 [INFO] Arrêt manuel détecté. Fermeture du serveur...")
+        logging.info("[INFO] Arrêt manuel détecté. Fermeture du serveur...")
         server_process.terminate()

@@ -6,6 +6,7 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from PyPDF2 import PdfReader
 from docx import Document
+import logging
 
 SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
 CREDS_FILE = 'credentials.json'
@@ -57,7 +58,7 @@ def download_attachments(service, msg_id, processed_files):
             if filename and any(filename.lower().endswith(ext) for ext in ['.pdf', '.docx']):
                 # Skip if already listed in the CSV
                 if filename in processed_files:
-                    print(f"==> [INFO] [*] Already processed (CSV): {filename}")
+                    logging.info(f"[INFO] [*] Already processed (CSV): {filename}")
                     continue
 
                 attach_id = part['body'].get('attachmentId')
@@ -70,7 +71,7 @@ def download_attachments(service, msg_id, processed_files):
                     path = os.path.join(SAVE_DIR, filename)
                     with open(path, 'wb') as f:
                         f.write(data)
-                    print(f"==> [SUCCESS] [+] File downloaded: {filename}")
+                    logging.info(f"[SUCCESS] [+] File downloaded: {filename}")
                     attachments.append(path)
 
             if 'parts' in part:
@@ -129,18 +130,18 @@ def main():
     processed_files = load_processed_files()
 
     ids = find_messages(service, subject)
-    print(f"==> [INFO] [*] {len(ids)} emails found for subject: {subject}")
+    logging.info(f"[INFO] [*] {len(ids)} emails found for subject: {subject}")
     results = []
 
     for i, msg_id in enumerate(ids, 1):
-        print(f"\n- Email {i}/{len(ids)}")
+        logging.info(f"[INFO] [*] Email {i}/{len(ids)}")
         attachments = download_attachments(service, msg_id, processed_files)
         if not attachments:
-            print("==> [INFO] [*] No new attachments to process.")
+            logging.info("[INFO] [*] No new attachments to process.")
             continue
 
         for att in attachments:
-            print(f"Analyzing {att} ...")
+            logging.info(f"[INFO] [*] Analyzing {att} ...")
             try:
                 if att.lower().endswith('.pdf'):
                     nums = extract_numbers_from_pdf(att)
@@ -151,38 +152,38 @@ def main():
 
                 valid_nums = [normalize_phone(n) for n in nums if looks_like_phone(n)]
                 if valid_nums:
-                    print(f"==> [INFO] [*] Valid numbers: {', '.join(valid_nums)}")
+                    logging.info(f"[INFO] [*] Valid numbers: {', '.join(valid_nums)}")
                     for n in valid_nums:
                         results.append((os.path.basename(att), n))
                 else:
-                    print("==> [WARNING] [!] No valid phone number found.")
+                    logging.warning("[WARNING] [!] No valid phone number found.")
             finally:
                 # Delete the file after analysis
                 try:
                     os.remove(att)
-                    print(f"==> [SUCCESS] [+] File removed: {att}")
+                    logging.info(f"[SUCCESS] [+] File removed: {att}")
                 except Exception as e:
-                    print(f"==> [ERROR] [!] Unable to remove {att}: {e}")
+                    logging.error(f"[ERROR] [!] Unable to remove {att}: {e}")
 
     # Summary and CSV export
     if results:
-        print("\n== FINAL SUMMARY ==")
+        logging.info("[INFO] [*] Final summary:")
         file_exists = os.path.exists(OUTPUT_FILE)
         with open(OUTPUT_FILE, 'a', newline='') as f:
             writer = csv.writer(f)
             if not file_exists:
                 writer.writerow(['File', 'Number'])
             for filename, num in sorted(set(results)):
-                print(f"• {filename} → {num}")
+                logging.info(f"[INFO] [*] {filename} → {num}")
                 writer.writerow([filename, num])
-        print(f"\n ==> [INFO] [*] Results appended to {OUTPUT_FILE} ({len(results)} new entries)")
+        logging.info(f"[INFO] [*] Results appended to {OUTPUT_FILE} ({len(results)} new entries)")
     else:
-        print("==> [INFO] [*] No new data to save.")
+        logging.info("[INFO] [*] No new data to save.")
 
     # Final cleanup of the directory if it's empty
     if os.path.exists(SAVE_DIR) and not os.listdir(SAVE_DIR):
         os.rmdir(SAVE_DIR)
-        print("==> [INFO] [*] 'attachments' folder removed (empty).")
+        logging.info("[INFO] [*] 'attachments' folder removed (empty).")
 
 if __name__ == '__main__':
     main()
