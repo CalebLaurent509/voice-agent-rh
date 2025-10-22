@@ -25,18 +25,42 @@ if os.getenv("GOOGLE_CREDENTIALS_B64"):
 
 # AUTHENTICATION
 def auth_gmail():
-    creds = None
-    if os.path.exists(TOKEN_FILE):
-        creds = Credentials.from_authorized_user_file(TOKEN_FILE, SCOPES)
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
+    """Authentifie Gmail via token .env ou navigateur local si nécessaire."""
+    google_token = None  # 🔧 Correction: initialisation
+    token_env = os.getenv("GOOGLE_TOKEN")
+
+    # 1️⃣ Si le token est défini dans .env (en Base64)
+    if token_env:
+        try:
+            decoded_token = json.loads(base64.b64decode(token_env).decode("utf-8"))
+            google_token = Credentials.from_authorized_user_info(decoded_token, SCOPES)
+            logging.info("✅ Token chargé depuis la variable d'environnement (Base64).")
+        except Exception as e:
+            logging.error(f"⚠️ Erreur lors du chargement du token .env : {e}")
+
+    # 2️⃣ Sinon, utiliser un token local
+    elif os.path.exists(TOKEN_FILE):
+        google_token = Credentials.from_authorized_user_file(TOKEN_FILE, SCOPES)
+        logging.info("✅ Token local (token.json) utilisé.")
+
+    # 3️⃣ Si aucun token valide : générer un nouveau via navigateur
+    if not google_token or not google_token.valid:
+        if google_token and google_token.expired and google_token.refresh_token:
+            google_token.refresh(Request())
+            logging.info("🔁 Token Gmail rafraîchi automatiquement.")
         else:
+            logging.info("🌐 Aucun token valide — ouverture du navigateur pour authentification...")
             flow = InstalledAppFlow.from_client_secrets_file(CREDS_FILE, SCOPES)
-            creds = flow.run_local_server(port=0)
+            google_token = flow.run_local_server(port=0)
+            logging.info("✅ Nouveau token généré via navigateur local.")
+
         with open(TOKEN_FILE, 'w') as f:
-            f.write(creds.to_json())
-    return build('gmail', 'v1', credentials=creds)
+            f.write(google_token.to_json())
+        logging.info("💾 Token sauvegardé dans token.json.")
+
+    return build('gmail', 'v1', credentials=google_token)
+
+
 
 # CSV UTILITY
 def load_processed_files():
