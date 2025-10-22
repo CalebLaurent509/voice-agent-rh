@@ -1,5 +1,5 @@
 # gmail_extract_numbers.py
-import os, re, base64, csv
+import os, re, base64, csv, json
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -7,12 +7,21 @@ from googleapiclient.discovery import build
 from PyPDF2 import PdfReader
 from docx import Document
 import logging
+from dotenv import load_dotenv
+load_dotenv()
 
+TOKEN = os.getenv("GOOGLE_TOKEN")
 SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
 CREDS_FILE = 'credentials.json'
 TOKEN_FILE = 'token.json'
 SAVE_DIR = 'attachments_temp'
 OUTPUT_FILE = 'phone_numbers.csv'
+
+# Décode le fichier credentials depuis la variable Render
+if os.getenv("GOOGLE_CREDENTIALS_B64"):
+    creds_data = base64.b64decode(os.getenv("GOOGLE_CREDENTIALS_B64"))
+    with open("credentials.json", "wb") as f:
+        f.write(creds_data)
 
 # AUTHENTICATION
 def auth_gmail():
