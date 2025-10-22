@@ -1,32 +1,7 @@
 services:
-  # 🌐 Service principal (FastAPI Calendly endpoint)
   - type: web
     name: voice-agent-rh
     env: python
     plan: free
     buildCommand: "pip install -r requirements.txt"
-    startCommand: "uvicorn get_calendly_data:app --host 0.0.0.0 --port 10000"
-    envVars:
-      - key: CALENDLY_TOKEN
-        sync: false
-      - key: CALENDLY_USER_ID
-        sync: false
-      - key: EVENT_TYPE_ID
-        sync: false
-
-  # ⚙️ Worker secondaire (surveillance Gmail)
-  - type: worker
-    name: gmail-watcher
-    env: python
-    plan: free
-    buildCommand: "pip install -r requirements.txt"
-    startCommand: "python gmail_watcher.py"
-    envVars:
-      - key: CREDS_FILE
-        value: "credentials.json"
-      - key: TOKEN_FILE
-        value: "token.json"
-      - key: SAVE_DIR
-        value: "attachments_temp"
-      - key: OUTPUT_FILE
-        value: "phone_numbers.csv"
+    startCommand: "python combined_runner.py"
