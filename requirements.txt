@@ -12,3 +12,4 @@ PyPDF2
 PyMuPDF
 python-docx
 python-dotenv
+vapi
