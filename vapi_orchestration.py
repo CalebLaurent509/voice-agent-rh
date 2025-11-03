@@ -2,10 +2,7 @@ import csv, os, time, json
 from dotenv import load_dotenv
 from vapi import Vapi
 from datetime import datetime
-import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
-
+import requests
 # ---------------------------
 # CONFIG
 # ---------------------------
@@ -23,22 +20,33 @@ SUMMARY_FILE = "call_summaries.json"
 # ---------------------------
 
 def send_email(to, subject, body):
-    sender = os.getenv("SENDER_EMAIL_SMTP")
-    password = os.getenv("SENDER_PASS_SMTP")
+    """Envoie un email via l’API Mailgun"""
+    api_key = os.getenv("MAILGUN_API_KEY")
+    domain = os.getenv("MAILGUN_DOMAIN")
 
-    msg = MIMEMultipart()
-    msg["From"] = sender
-    msg["To"] = to
-    msg["Subject"] = subject
-    msg.attach(MIMEText(body, "plain"))
+    if not api_key or not domain:
+        print("⚠️ MAILGUN_API_KEY ou MAILGUN_DOMAIN manquant dans .env")
+        return
 
     try:
-        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
-            server.login(sender, password)
-            server.send_message(msg)
-        print(f"- Email envoyé à {to} (Candidat) de l’expéditeur {sender}")
+        response = requests.post(
+            f"https://api.mailgun.net/v3/{domain}/messages",
+            auth=("api", api_key),
+            data={
+                "from": f"Recruitment Bot <postmaster@{domain}>",
+                "to": to,
+                "subject": subject,
+                "text": body,
+            },
+        )
+
+        if response.status_code == 200:
+            print(f"✅ Email envoyé à {to}")
+        else:
+            print(f"⚠️ Erreur Mailgun ({response.status_code}): {response.text}")
+
     except Exception as e:
-        print(f"⚠️ Erreur d’envoi d’email à {to}: {e}") 
+        print(f"❌ Erreur d’envoi via Mailgun: {e}")
 
 
 def load_called_numbers():
@@ -122,48 +130,36 @@ def wait_for_completion(call_id):
     return None
 
 def notify_if_qualified(entry):
+    """Envoie uniquement un email au recruteur si un candidat est qualifié."""
     recruiter = os.getenv("RECRUITER_EMAIL")
-
     data = entry.get("structured_data", {})
+
     if not data.get("qualified"):
-        return  # Non qualifié, ne rien faire
+        return  # Ne rien faire si non qualifié
 
     candidate_name = data.get("candidate_name", "Candidate")
     interview_time = data.get("interview_time", "To be confirmed")
     summary = entry.get("summary", "")
     number = entry.get("number")
-    candidate_email = get_sender_email_by_number(number)
 
-    # Email au recruteur
     recruiter_body = f"""
-    Hello,
-    A candidate has been qualified for interview.
+    Hello Recruiter,
+
+    A candidate has been qualified for an interview.
 
     Name: {candidate_name}
     Number: {number}
-    Interview Time:\
-    {interview_time}
+    Interview Time: {interview_time}
 
     Summary:
     {summary}
+
+    ---
+    Message sent automatically by the Voice Agent System.
     """
+
     send_email(recruiter, f"Qualified Candidate: {candidate_name}", recruiter_body)
 
-    # Email au candidat
-    candidate_body = f"""
-    Hello {candidate_name},
-
-    Congratulations! You have been qualified\
-    for the next interview step at Starlight PR.
-    Your interview is scheduled for:\
-    {interview_time}
-    Our recruiter will contact you at this number:\
-    {number}
-
-    Best,
-    Starlight PR Team
-    """
-    send_email(candidate_email, f"Interview Confirmation – {candidate_name}", candidate_body)
 
 
 def save_summary(call_obj, number):

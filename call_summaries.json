@@ -1,0 +1,17 @@
+[
+  {
+    "number": "+15743980354",
+    "timestamp": "2025-11-03 17:45:17",
+    "summary": "Daniel from Starlight PR conducted a pre-screening call with Caleb for a sales representative position, confirming his 5 years of sales experience, 30 daily outbound calls, availability for the specified shift, and a two-week start time. Caleb was successfully scheduled for an interview on Thursday, November 6th, between 10 AM and 4 PM.",
+    "structured_data": {
+      "next_step": "Interview scheduled",
+      "qualified": true,
+      "start_time": "Within 2 weeks",
+      "daily_calls": "30",
+      "candidate_name": "Caleb",
+      "interview_time": "Thursday, November sixth from 10 AM to 4 PM",
+      "sales_experience": "5",
+      "availability_hours": "12 PM and 6 PM Eastern Standard Time, Monday through Friday"
+    }
+  }
+]
