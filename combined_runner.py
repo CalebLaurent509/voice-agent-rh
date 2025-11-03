@@ -27,13 +27,6 @@ def is_within_hours():
     end = now.replace(hour=4, minute=0, second=0, microsecond=0) + datetime.timedelta(days=1)
     return start <= now <= end
 
-def start_server():
-    """Demarre le serveur FastAPI dans un sous-processus"""
-    print("[INFO] Launching FastAPI server...")
-    return subprocess.Popen(
-        ["uvicorn", "get_calendly_data:app", "--host", "0.0.0.0", "--port", "10000"]
-    )
-
 # EMAIL UTILS
 def send_email(to, subject, body):
     """Envoie un email via l’API Mailgun"""
@@ -188,9 +181,7 @@ def save_summary(call_obj, number):
 
 # MAIN SCHEDULER LOOP
 if __name__ == "__main__":
-    print("[INFO] Starting server and Gmail watcher...")
-    server_process = start_server()
-    
+    print("[INFO] Starting server and Gmail watcher...")    
     try:
         while True:
             if is_within_hours():
@@ -219,4 +210,3 @@ if __name__ == "__main__":
                 time.sleep(1800)
     except KeyboardInterrupt:
         print("[INFO] Manual stop detected. Closing server...")
-        server_process.terminate()
