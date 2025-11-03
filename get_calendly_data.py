@@ -85,6 +85,10 @@ def get_availability(threshold: int = 3):
         "available_days": daily_slots
     }
 
+@app.get("/wake-up")
+async def wake_up():
+    """Endpoint de wake-up pour Render.com"""
+    return JSONResponse(content={"status": "awake"})
 
 @app.post("/availability")
 async def availability_tool(request: Request):
