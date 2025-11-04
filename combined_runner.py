@@ -1,7 +1,7 @@
 import os
 import threading
 import time
-import datetime
+import datetime, pytz
 import csv, json, requests
 from datetime import datetime as dt
 from dotenv import load_dotenv
@@ -37,11 +37,16 @@ def keep_alive():
 
 # ================= UTILS =================
 def is_within_hours():
-    """Renvoie True si on est entre 7h00 et 4h00 (du lendemain)."""
-    now = datetime.datetime.now()
+    """Renvoie True si on est entre 19h (7 PM) aujourd’hui et 4h du matin demain — fuseau US/Eastern."""
+    tz = pytz.timezone("America/New_York")
+    now = datetime.datetime.now(tz)
+    # Début à 19h aujourd’hui (7 PM)
     start = now.replace(hour=19, minute=0, second=0, microsecond=0)
-    end = now.replace(hour=4, minute=0, second=0, microsecond=0) + datetime.timedelta(days=1)
+    # Fin à 4h demain matin
+    end = (start + datetime.timedelta(days=1)).replace(hour=16, minute=0, second=0, microsecond=0)
+    # True si l’heure actuelle est entre les deux
     return start <= now <= end
+
 
 def send_email(to, subject, body):
     """Envoie un email via Mailgun."""
