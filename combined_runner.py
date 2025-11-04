@@ -33,7 +33,7 @@ def keep_alive():
             print(f"[KEEP-ALIVE] Ping -> {r.status_code}")
         except Exception as e:
             print("[KEEP-ALIVE ERROR]", e)
-        time.sleep(30)  # toutes les 5 minutes (recommandé)
+        time.sleep(300)  # toutes les 5 minutes (recommandé)
 
 # ================= UTILS =================
 def is_within_hours():
