@@ -39,8 +39,8 @@ def keep_alive():
 def is_within_hours():
     """Renvoie True si on est entre 7h00 et 4h00 (du lendemain)."""
     now = datetime.datetime.now()
-    start = now.replace(hour=11, minute=0, second=0, microsecond=0)
-    end = now.replace(hour=11, minute=0, second=0, microsecond=0) + datetime.timedelta(days=1)
+    start = now.replace(hour=19, minute=0, second=0, microsecond=0)
+    end = now.replace(hour=4, minute=0, second=0, microsecond=0) + datetime.timedelta(days=1)
     return start <= now <= end
 
 def send_email(to, subject, body):
