@@ -1,17 +1,33 @@
 [
   {
     "number": "+15743980354",
-    "timestamp": "2025-11-03 17:45:17",
-    "summary": "Daniel from Starlight PR conducted a pre-screening call with Caleb for a sales representative position, confirming his 5 years of sales experience, 30 daily outbound calls, availability for the specified shift, and a two-week start time. Caleb was successfully scheduled for an interview on Thursday, November 6th, between 10 AM and 4 PM.",
+    "timestamp": "2025-11-03 18:52:33",
+    "summary": "Daniel from Starlight PR called to confirm Joe's application for a sales representative position, asking about his experience (10 years), call volume (10 per day), and availability. Joe agreed to the work hours and confirmed an interview for Thursday, November 6th at 10 AM Eastern Standard Time, with the ability to start within 2 weeks.",
     "structured_data": {
       "next_step": "Interview scheduled",
       "qualified": true,
       "start_time": "Within 2 weeks",
-      "daily_calls": "30",
-      "candidate_name": "Caleb",
-      "interview_time": "Thursday, November sixth from 10 AM to 4 PM",
-      "sales_experience": "5",
+      "daily_calls": "10",
+      "candidate_name": "Joe",
+      "interview_time": "Thursday, November sixth, at 10 AM",
+      "sales_experience": "10",
       "availability_hours": "12 PM and 6 PM Eastern Standard Time, Monday through Friday"
+    }
+  },
+  {
+    "number": "+17658370549",
+    "timestamp": "2025-11-03 18:53:02",
+    "summary": "",
+    "structured_data": {}
+  },
+  {
+    "number": "+15743980354",
+    "timestamp": "2025-11-03 18:53:45",
+    "summary": "Daniel from Starlight PR called and left a voicemail for Caleb Lawrence, but the message was cut off after only saying \"Hello. This is Daniel calling from Starlight PR.\"",
+    "structured_data": {
+      "next_step": "voicemail",
+      "qualified": false,
+      "candidate_name": "Caleb Lawrence"
     }
   }
 ]
