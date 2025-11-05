@@ -43,7 +43,7 @@ def is_within_hours():
     # Début à 19h aujourd’hui (7 PM)
     start = now.replace(hour=19, minute=0, second=0, microsecond=0)
     # Fin à 4h demain matin
-    end = (start + datetime.timedelta(days=1)).replace(hour=16, minute=0, second=0, microsecond=0)
+    end = (start + datetime.timedelta(days=1)).replace(hour=18, minute=0, second=0, microsecond=0)
     # True si l’heure actuelle est entre les deux
     return start <= now <= end
 
