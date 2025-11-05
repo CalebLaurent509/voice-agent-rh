@@ -168,22 +168,22 @@ def job_loop():
     print("[INFO] Background worker started ✅")
     while True:
         try:
-            if is_within_hours():
-                print("[INFO] Valid time slot (7h-4h): scanning Gmail and making calls")
-                gmail_scan()
-                numbers = get_numbers_to_call()
-                for num in numbers:
-                    call_id = create_call(num)
-                    if not call_id:
-                        continue
-                    call_obj = wait_for_completion(call_id)
-                    if not call_obj:
-                        continue
-                    if call_obj.status in ("completed", "ended"):
-                        log_call(num, call_obj.status)
-                        save_summary(call_obj, num)
-                        print("[SUCCESS] Call completed for", num)
-                    time.sleep(10)
+            #if is_within_hours():
+            print("[INFO] Valid time slot (7h-4h): scanning Gmail and making calls")
+            gmail_scan()
+            numbers = get_numbers_to_call()
+            for num in numbers:
+                call_id = create_call(num)
+                if not call_id:
+                    continue
+                call_obj = wait_for_completion(call_id)
+                if not call_obj:
+                    continue
+                if call_obj.status in ("completed", "ended"):
+                    log_call(num, call_obj.status)
+                    save_summary(call_obj, num)
+                    print("[SUCCESS] Call completed for", num)
+                time.sleep(10)
             else:
                 print("[INFO] Outside hours (7h-4h). Sleeping 30min...")
                 time.sleep(1800)
