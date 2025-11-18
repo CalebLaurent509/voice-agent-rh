@@ -1,33 +1,53 @@
 [
   {
     "number": "+15743980354",
-    "timestamp": "2025-11-03 18:52:33",
-    "summary": "Daniel from Starlight PR called to confirm Joe's application for a sales representative position, asking about his experience (10 years), call volume (10 per day), and availability. Joe agreed to the work hours and confirmed an interview for Thursday, November 6th at 10 AM Eastern Standard Time, with the ability to start within 2 weeks.",
+    "timestamp": "2025-11-18 01:32:25",
+    "summary": "Daniel from Starlight PR called Caleb to pre-screen him for a sales representative position, confirming his 10 years of sales experience, ability to make 10 outbound calls daily, and acceptance of the 12 PM-6 PM EST work schedule. Caleb indicated he could start within two weeks and was subsequently scheduled for an interview on Friday, November 21st, between 9 AM and 3:15 PM.",
     "structured_data": {
       "next_step": "Interview scheduled",
       "qualified": true,
       "start_time": "Within 2 weeks",
       "daily_calls": "10",
-      "candidate_name": "Joe",
-      "interview_time": "Thursday, November sixth, at 10 AM",
-      "sales_experience": "10",
-      "availability_hours": "12 PM and 6 PM Eastern Standard Time, Monday through Friday"
+      "candidate_name": "Caleb",
+      "interview_time": "Friday, November 20th, between 9 AM and 3:15 PM",
+      "sales_experience": "10 years",
+      "availability_hours": "12 PM to 6 PM EST, Monday through Friday"
     }
   },
   {
     "number": "+17658370549",
-    "timestamp": "2025-11-03 18:53:02",
+    "timestamp": "2025-11-18 01:32:53",
     "summary": "",
     "structured_data": {}
   },
   {
     "number": "+15743980354",
-    "timestamp": "2025-11-03 18:53:45",
-    "summary": "Daniel from Starlight PR called and left a voicemail for Caleb Lawrence, but the message was cut off after only saying \"Hello. This is Daniel calling from Starlight PR.\"",
+    "timestamp": "2025-11-18 01:34:10",
+    "summary": "Daniel from Starlight PR called regarding a sales representative position application. The call was repeatedly interrupted by automated menu prompts, preventing Daniel from fully explaining his purpose. The call ended abruptly without a clear resolution or conversation.",
     "structured_data": {
-      "next_step": "voicemail",
+      "next_step": "Not qualified",
       "qualified": false,
-      "candidate_name": "Caleb Lawrence"
+      "start_time": "Not specified",
+      "daily_calls": "Not specified",
+      "candidate_name": "Caleb Lawrence",
+      "interview_time": "Not scheduled",
+      "sales_experience": "Not specified",
+      "availability_hours": "Not specified"
+    }
+  },
+  {
+    "number": "+15743980354",
+    "timestamp": "2025-11-18 01:50:05",
+    "summary": "Starlight PR called KLM to confirm their application for a sales representative position and conduct a pre-interview screening. KLM confirmed 10 years of sales experience, making 10 outbound calls daily, availability for the required work hours, and a two-week start time. An interview was successfully scheduled for Friday, November 20th, between 9 AM and 3:15 PM.",
+    "structured_data": {
+      "next_step": "Interview scheduled",
+      "qualified": true,
+      "start_time": "Within 2 weeks",
+      "daily_calls": "10",
+      "candidate_name": "KLM",
+      "interview_time": "Friday, November 20th from 9 AM to 3:15 PM",
+      "sales_experience": "10 years",
+      "availability_hours": "12 PM to 6 PM EST, Monday through Friday"
     }
   }
 ]
