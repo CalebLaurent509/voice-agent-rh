@@ -23,7 +23,7 @@ HEADERS = {"Authorization": TOKEN, "Content-Type": "application/json"}
 client = Vapi(token=os.getenv("VAPI_API_KEY"))
 AGENT_ID = os.getenv("VAPI_AGENT_ID")
 PHONE_ID = os.getenv("PHONE_ID")
-URL = "https://voice-agent-rh-1-hgt5.onrender.com"
+URL = "https://get-tidycal-data.onrender.com"
 
 CSV_FILE = "phone_numbers.csv"
 CALLED_LOG = "called_numbers.csv"
@@ -43,20 +43,17 @@ def keep_alive():
 
 def is_within_hours():
     """
-    Renvoie True si on est entre 19h (7 PM) aujourd’hui et minuit,
-    OU entre minuit et 4h du matin — fuseau US/Eastern.
+    Renvoie True si on est entre 7h du matin (07:00 AM)
+    et 16h (4:00 PM) aujourd’hui — fuseau US/Eastern.
     """
     tz = pytz.timezone("America/New_York")
     now = datetime.datetime.now(tz)
 
-    today_19 = now.replace(hour=19, minute=0, second=0, microsecond=0)
-    tomorrow_4 = (today_19 + datetime.timedelta(days=1)).replace(
-        hour=4, minute=0, second=0, microsecond=0
-    )
+    start = now.replace(hour=7, minute=0, second=0, microsecond=0)   # 07:00
+    end   = now.replace(hour=16, minute=0, second=0, microsecond=0)  # 16:00 (4 PM)
 
-    if today_19 <= now <= tomorrow_4:
-        return True
-    return False
+    return start <= now <= end
+
 
 
 def load_called_numbers():
@@ -264,6 +261,11 @@ def job_loop():
     print("[INFO] Background worker started ✅")
     while True:
         try:
+            if not is_within_hours():
+                print("[INFO] Outside hours (7 AM - 4 PM). Sleeping 30min...")
+                time.sleep(1800)
+                continue
+
             print("[INFO] Scanning Gmail and making calls...")
             gmail_scan()
 
