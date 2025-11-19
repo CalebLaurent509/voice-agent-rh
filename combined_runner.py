@@ -143,25 +143,22 @@ def parse_interview_time(text, default_tz="America/New_York"):
 
 
 def book_meeting_local(starts_at, name, email, phone, role, timezone="America/New_York"):
-    """
-    Crée une réservation TidyCal en local sans endpoint FastAPI.
-    C’est ton ancien /book, transformé en simple fonction Python.
-    """
 
     if not all([starts_at, name, email, phone, role]):
         print("[BOOKING] Champs manquants pour la réservation:", {
             "starts_at": starts_at, "name": name, "email": email,
             "phone": phone, "role": role
         })
-        return {
-            "error": "Missing required fields: starts_at, name, email, phone, role"
-        }
+        return {"error": "Missing required fields"}
+
+    # FIX : retirer le timezone (-05:00) pour éviter décalage double
+    starts_at_clean = starts_at.split("-")[0]   # => "2025-11-21T09:15:00"
 
     payload = {
-        "starts_at": starts_at,
+        "starts_at": starts_at_clean,
         "name": name,
         "email": email,
-        "timezone": timezone,
+        "timezone": timezone,  # on laisse cette ligne
         "booking_questions": [
             {"booking_type_question_id": 1, "answer": phone},
             {"booking_type_question_id": 2, "answer": role}
